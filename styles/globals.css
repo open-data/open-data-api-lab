@@ -1,9 +1,12 @@
 @config '../tailwind.config.js';
+@import 'bootstrap';
+@import 'datatables.net-bs5';
+@import 'datatables.net-buttons-bs5';
+@import 'datatables.net-responsive-bs5';
 @import 'tailwindcss';
 
 html,
 body {
-  @apply bg-palette-white;
   @apply overflow-x-hidden;
   @apply p-0;
   @apply m-0;
@@ -28,6 +31,15 @@ a {
   @apply text-inherit;
   @apply no-underline;
   @apply break-normal!;
+  @apply focus:outline-none;
+  @apply focus:shadow-none;
+  @apply focus:border-none;
+}
+
+button {
+  @apply focus:outline-none;
+  @apply focus:shadow-none;
+  @apply focus:border-none;
 }
 
 span {
@@ -37,20 +49,83 @@ span {
 p,
 li {
   @apply font-roboto;
+  @apply text-lg;
   @apply break-normal!;
+}
+
+p {
+  @apply pb-1;
+}
+
+pre.shiki {
+  @apply rounded-none!;
+  @apply m-0!;
+  @apply transition-none!;
+  @apply duration-0!;
+  @apply max-w-full!;
+  @apply w-full!;
+}
+
+table {
+  @apply w-full;
+  @apply max-w-full;
+  @apply min-w-full;
+  @apply overflow-x-scroll;
+}
+
+.shiki code {
+  @apply block!;
+}
+
+pre.shiki * {
+  @apply transition-none!;
+  @apply duration-0!;
 }
 
 h1,
 h2,
 h3 {
+  @apply text-ui-white;
+  @apply font-roboto;
+  @apply break-normal!;
+  @apply font-semibold!;
+}
+
+h1 {
   @apply text-5xl;
   @apply max-s500:text-2xl;
   @apply max-s768:text-3xl;
   @apply max-s992:text-4xl;
-  @apply text-palette-red;
-  @apply font-roboto;
-  @apply break-normal!;
-  @apply font-semibold!;
+  @apply border-b-6;
+  @apply border-palette-red;
+  border-image: linear-gradient(to right, #a62a1e 144px, transparent 144px);
+  border-image-slice: 1;
+  @apply pb-1;
+  @apply mb-8;
+  @apply mt-4;
+}
+
+h2 {
+  @apply text-4xl;
+  @apply max-s500:text-2xl;
+  @apply max-s768:text-2xl;
+  @apply max-s992:text-3xl;
+  @apply mb-2;
+  @apply mt-4;
+}
+
+h3 {
+  @apply text-2xl;
+  @apply max-s500:text-xl;
+  @apply max-s768:text-xl;
+  @apply max-s992:text-2xl;
+  @apply mb-2;
+  @apply mt-4;
+}
+
+.dt-container .highlight {
+  @apply bg-[rgba(255,229,54,0.35)];
+  @apply text-palette-black;
 }
 
 * {

@@ -6,6 +6,11 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  transpilePackages: [
+    'react-shiki',
+    'datatables.net-react',
+    'datatables.net-bs5',
+  ],
   experimental: {
     optimizePackageImports: ['@phosphor-icons/react'],
   },

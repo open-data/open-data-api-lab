@@ -3,10 +3,10 @@ import { motion as m, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { TableIcon } from '@phosphor-icons/react';
-import { SideBarLinkStyle } from '@/utils/classNames';
+import { MenuBarLinkStyle } from '@/utils/classNames';
 import { slideInLeftAnimation } from '@/utils/animations';
 
-export default function SideBar(props) {
+export default function MenuBar(props) {
   return (
     <AnimatePresence>
       <m.div
@@ -17,19 +17,24 @@ export default function SideBar(props) {
           'right-0',
           'bottom-0',
           'w-2/12',
-          'bg-palette-lite-grey',
+          'bg-ui-dark-bg',
+          'border-r-2',
+          'border-ui-dark-border-color',
         )}
         variants={slideInLeftAnimation}
         initial={'hidden'}
         animate={'show'}
       >
-        <div className={clsx('bg-palette-dark-blue', 'px-5', 'py-4')}>
+        <div className={clsx('bg-ui-dark-bg', 'px-5', 'py-4')}>
           <Link
             href={'/'}
             className={clsx(
-              'text-palette-white!',
+              'group',
+              'text-ui-white!',
               'font-semibold',
               'flex',
+              'transition-all',
+              'duration-300',
               'justify-start',
               'items-center',
               props.pathname == '/'
@@ -39,14 +44,24 @@ export default function SideBar(props) {
             tabIndex={props.pathname == '/' ? '-1' : '0'}
           >
             <Image
-              src={'/opendatacan_r.png'}
-              width={65}
-              height={65}
+              src={'/opendatacan_t.png'}
+              width={75}
+              height={75}
               alt={''}
-              className={clsx('w-8', 'h-8')}
+              className={clsx('w-10', 'h-10')}
             />
             &nbsp;&nbsp;&nbsp;
-            <span>Canadian Open Data API Lab</span>
+            <span
+              className={clsx(
+                'transition-all',
+                'duration-300',
+                'group-hover:scale-103',
+                'group-focus:scale-103',
+                'group-active:scale-103',
+              )}
+            >
+              Canadian Open Data API Lab
+            </span>
           </Link>
         </div>
         <div
@@ -57,22 +72,20 @@ export default function SideBar(props) {
             'px-4',
             'py-2',
             'h-full',
-            'border-r-2',
-            'border-palette-lite-grey-accent',
           )}
         >
           <Link
-            href={'/embed-datatables'}
+            href={'/datastore-datatables'}
             className={clsx(
-              SideBarLinkStyle,
-              props.pathname == '/embed-datatables'
-                ? 'bg-palette-lite-grey-accent! pointer-default! pointer-events-none!'
+              MenuBarLinkStyle,
+              props.pathname == '/datastore-datatables'
+                ? 'bg-ui-btn-bg-active! pointer-default! pointer-events-none!'
                 : '',
             )}
-            tabIndex={props.pathname == '/embed-datatables' ? '-1' : '0'}
+            tabIndex={props.pathname == '/datastore-datatables' ? '-1' : '0'}
           >
             <TableIcon size={24} />
-            &nbsp; Embed DataTables
+            &nbsp; DataStore DataTables
           </Link>
         </div>
       </m.div>

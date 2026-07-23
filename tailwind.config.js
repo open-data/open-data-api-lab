@@ -5,7 +5,9 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './dependencies/**/*.{js,ts,jsx,tsx,mdx}',
+    './utils/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  important: true,
   theme: {
     extend: {
       colors: {
@@ -18,6 +20,8 @@ module.exports = {
         'palette-stone': '#c9c9c9',
         'palette-blue': '#335075',
         'palette-dark-blue': '#38414d',
+        'ui-white': '#adb5bd',
+        'ui-screen-bg': '#212529',
         'ui-dark-bg': '#212121',
         'ui-btn-bg-active': '#2f2f2f',
         'ui-btn-bg-focus': '#171717',

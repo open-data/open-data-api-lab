@@ -2,7 +2,13 @@ import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   return (
-    <Html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
+    <Html
+      lang="en"
+      data-bs-theme="dark"
+      class="dark"
+      className="scroll-smooth"
+      data-scroll-behavior="smooth"
+    >
       <Head>
         <meta name="theme-color" content="#38414d" />
 

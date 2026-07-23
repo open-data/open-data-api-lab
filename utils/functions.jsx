@@ -1,12 +1,11 @@
-import { API_BASE_URI } from '@/utils/constants';
+import { API_BASE_URI, API_KEY } from '@/utils/constants';
 
 export async function ckan_api(url, init = {}) {
   const response = await fetch(url, {
     ...init,
     headers: {
       Accept: 'application/json',
-      Authorization:
-        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ0WEZZQTRNWkhfcVFqWThOa3FRbVpmTXFsTzZHV0xCdnVvbE90bzYxcTlBIiwiaWF0IjoxNzE5NTE2MDM3fQ.9gX6_MI_gMRhV9MKnPPa1kHuCU5cQC_ra-bBoGfkdqA',
+      Authorization: API_KEY,
       ...init.headers,
     },
   });
