@@ -1,4 +1,4 @@
-name: Build & Publish Release Notes
+name: Build Web Pages
 env:
   NODE_VERSION: '24'
 on:
