@@ -2,8 +2,22 @@
 @import 'bootstrap';
 @import 'datatables.net-bs5';
 @import 'datatables.net-buttons-bs5';
+@import 'datatables.net-columncontrol-bs5';
 @import 'datatables.net-responsive-bs5';
 @import 'tailwindcss';
+
+@theme {
+  --animate-loader: loader 1s linear infinite;
+
+  @keyframes loader {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0 0;
+    }
+  }
+}
 
 html,
 body {
@@ -80,6 +94,12 @@ table {
 pre.shiki * {
   @apply transition-none!;
   @apply duration-0!;
+}
+
+.dtcc-search-type-icon,
+.dtcc-search-type-icon + select {
+  @apply hidden!;
+  @apply pointer-events-none!;
 }
 
 h1,

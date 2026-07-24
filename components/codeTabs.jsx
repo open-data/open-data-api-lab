@@ -7,6 +7,7 @@ import {
   TerminalIcon,
   CodeIcon,
 } from '@phosphor-icons/react';
+import Loader from '@/components/loader';
 import {
   CodeTabStyle,
   CodeTabButtonStyle,
@@ -23,6 +24,26 @@ const themeMap = {
   javascript: 'tokyo-night',
   python: 'one-dark-pro',
   bash: 'dracula',
+};
+
+const statusMap = {
+  0: 'bg-palette-dark-blue',
+  200: 'bg-[#28a745]',
+  301: 'bg-[#28a745]',
+  302: 'bg-[#28a745]',
+  304: 'bg-[#28a745]',
+  400: 'bg-[#ffc107]',
+  401: 'bg-[#ffc107]',
+  403: 'bg-[#ffc107]',
+  404: 'bg-[#ffc107]',
+  405: 'bg-[#ffc107]',
+  408: 'bg-[#ffc107]',
+  409: 'bg-[#ffc107]',
+  429: 'bg-[#ffc107]',
+  500: 'bg-[#dc3545]',
+  502: 'bg-[#dc3545]',
+  503: 'bg-[#dc3545]',
+  504: 'bg-[#dc3545]',
 };
 
 export default function CodeTabs(props) {
@@ -81,7 +102,7 @@ export default function CodeTabs(props) {
           </button>
         </div>
 
-        {current && (
+        {current ? (
           <ShikiHighlighter
             className={clsx('overflow-x-scroll!', 'text-sm', 'rounded-none!')}
             language={current.language}
@@ -91,6 +112,17 @@ export default function CodeTabs(props) {
           >
             {current.code}
           </ShikiHighlighter>
+        ) : (
+          <div
+            className={clsx(
+              'min-h-32',
+              'flex',
+              'items-center',
+              'justify-center',
+            )}
+          >
+            <Loader />
+          </div>
         )}
       </div>
 
@@ -108,7 +140,18 @@ export default function CodeTabs(props) {
                   'pointer-events-none!',
                 )}
               >
-                Response
+                <span
+                  className={clsx(
+                    props.response.status in statusMap
+                      ? statusMap[props.response.status]
+                      : statusMap[0],
+                    'w-3',
+                    'h-3',
+                    'rounded-full',
+                  )}
+                ></span>
+                &nbsp;&nbsp;Response&nbsp;({props.response.status}&nbsp;
+                {props.response.statusText})
               </span>
             </div>
           </div>
@@ -119,7 +162,7 @@ export default function CodeTabs(props) {
             showLineNumbers={false}
             startingLineNumber={1}
           >
-            {JSON.stringify(props.response, null, 2).trim()}
+            {JSON.stringify(props.response.json, null, 2).trim()}
           </ShikiHighlighter>
         </div>
       )}

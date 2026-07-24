@@ -37,6 +37,7 @@ export const PageMainStyle = clsx(
   'px-8',
   'flex',
   'gap-8',
+  'overflow-hidden',
 );
 
 export const ContainerMainStyle = clsx(
@@ -60,6 +61,7 @@ export const PageBreakStyle = clsx(
 export const CodeTabStyle = clsx(
   'flex',
   'flex-col',
+  'relative',
   'w-[calc(41.666667%-64px)]!',
   'max-w-[calc(41.666667%-64px)]!',
   'min-w-[calc(41.666667%-64px)]!',

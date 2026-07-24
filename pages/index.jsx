@@ -21,8 +21,8 @@ export default function HomePage(props) {
   useEffect(() => {
     async function load_example_response() {
       try {
-        const json = await ckan_action_api('status_show');
-        setexampleResponse(json);
+        const response = await ckan_action_api('status_show');
+        setexampleResponse(response);
       } catch (err) {
         console.error(err);
       }

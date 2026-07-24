@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import DataTable from '@/components/dataTableClient';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion as m, AnimatePresence } from 'motion/react';
 import DocHead from '@/components/docHead';
 import Link from 'next/link';
 import CodeTabs from '@/components/codeTabs';
+import Loader from '@/components/loader';
 import {
   PageMainStyle,
   ContainerMainStyle,
@@ -23,11 +24,7 @@ export default function EmbedDataTablesPage(props) {
       label: 'JavaScript',
       language: 'javascript',
       code: `
-<table id="example" class="display table table-striped" style="width:100%">
-  <thead>
-    <tr id="header-row"></tr>
-  </thead>
-</table>
+<table id="example" class="display table table-striped" style="width:100%"></table>
 
 <script>
   fetch('${API_BASE_URI}/data/api/action/datastore_search?resource_id=04cbec5c-5a3d-4d34-927d-e41c9e6e3736&limit=32000')
@@ -37,12 +34,6 @@ export default function EmbedDataTablesPage(props) {
         title: _f.id,
         data: _f.id
       }));
-      const headerRow = document.getElementById('header-row');
-      columns.forEach(_c => {
-        const th = document.createElement('th');
-        th.textContent = _c.id;
-        headerRow.appendChild(th);
-      });
       new DataTable('#example', {
         data: data.result.records,
         columns: columns,
@@ -60,6 +51,136 @@ export default function EmbedDataTablesPage(props) {
     },
   ];
 
+  const server_table_examples = [
+    {
+      label: 'JavaScript',
+      language: 'javascript',
+      code: `
+<style>
+  /* disable ColumnControl advance selections as DataStore only supports exact matches for filters */
+  .dtcc-search-type-icon{display: none !important; pointer-events: none !important;}
+  .dtcc-search-type-icon+select{display: none !important; pointer-events: none !important;}
+  mark, span.highlight{background: yellow; color: #1f1f1f; padding: 0;}
+</style>
+
+<table id="example" class="display table table-striped" style="width:100%"></table>
+
+<script>
+  fetch('${API_BASE_URI}/api/action/datastore_search?resource_id=fac950c0-00d5-4ec1-a4d3-9cbebf98a305&limit=0')
+    .then(r => r.json())
+    .then(data => {
+      const columns = data.result.fields.filter(_f => _f.id !== "_id").map(_f => ({
+        title: _f.id,
+        data: _f.id,
+
+      }));
+      // disable ColumnControl search on keypress, see initComplete for Enter key binding
+      DataTable.ColumnControl.SearchInput.prototype.runSearch = function(){ return; }
+      const table = new DataTable('#example', {
+        columns: columns,
+        columnControl: [
+          {
+            "target": "thead",
+            "content": ["order"]
+          },
+          {
+            "target": "tfoot",
+            "content": ["search"]
+          }
+        ],
+        processing: true,
+        serverSide: true,
+        searching: false,  // source has too many records for full-text search
+        scrollX: true,
+        scrollY: '448px',
+        ajax: (_data, _callback) => {
+          // convert DataTables components to DataStore parameters
+          const limit = _data.length || 10;
+          const offset = _data.start || 0;
+          const search = encodeURIComponent(_data.search.value) || '';
+          const orderColumnIndex = typeof _data.order[0] != 'undefined' ? _data.order[0].column : null;
+          const orderDirection = typeof _data.order[0] != 'undefined' ? _data.order[0].dir : null;
+          const orderColumnName = typeof _data.order[0] != 'undefined' ? columns[orderColumnIndex].data : null;
+          const sort = orderColumnName ? encodeURIComponent(\`\${orderColumnName} \${orderDirection}\`) : '';
+          let filters = {};
+          _data.columns.forEach((_c) => {
+            if( _c.search.value ){
+              filters[_c.data] = _c.search.value;
+            }
+          });
+          filters = encodeURIComponent(JSON.stringify(filters));
+          const url = \`
+            ${API_BASE_URI}/api/action/datastore_search?resource_id=fac950c0-00d5-4ec1-a4d3-9cbebf98a305
+            &limit=\${limit}
+            &offset=\${offset}
+            &sort=\${sort}
+            &filters=\${filters}
+            &q=\${search}
+          \`;
+          fetch(url)
+            .then(r => r.json())
+            .then(json => _callback({
+              data: json.result.records,
+              recordsTotal: json.result.total,
+              recordsFiltered: json.result.total
+            }));
+        },
+        initComplete: (_settings, _data) => {
+          // add custom Enter key binding for column filter inputs
+          const bindColumnSearch = (_column, _input) => {
+            $(_input).off('keyup.filterCol');
+            $(_input).on('keyup.filterCol', (_event) => {
+              const _fVal = $(_input).val();
+              if( _event.keyCode == 13 && _column.search() !== _fVal ){
+                _column.search(_fVal).draw();
+              }
+            });
+          }
+          table.columns().every(function(_i){
+            const columnFilter = $(this.footer()).find('input');
+            if( columnFilter.length > 0 ){
+              bindColumnSearch(this, columnFilter);
+              return;
+            }
+            // re-attempt to bind, due to ColumnControl plugin painting
+            const maxTries = 35;
+            let interval = false;
+            let tries = 0;
+            interval = setInterval(() => {
+              const columnFilter = $(this.footer()).find('input');
+              if( columnFilter.length > 0 || tries > maxTries ){
+                clearInterval(interval);
+                interval = false;
+                bindColumnSearch(this, columnFilter);
+                return;
+              }
+              tries++;
+            }, 150);
+          });
+        },
+        drawCallback: (_settings) => {
+          // highlight column searches
+          if( ! $.fn.unhighlight ){
+            return;
+          }
+          const body = $('#example tbody');
+          body.unhighlight();
+          table.columns().every(function(_i){
+            const search = this.search();
+            if( search ){
+              $(this.nodes()).highlight(search);
+            }
+          });
+        }
+      });
+    }).catch(err => {
+      console.error(err);
+    });
+</script>
+  `.trim(),
+    },
+  ];
+
   const [staticTableData, setStaticTableData] = useState({
     data: [],
     columns: [],
@@ -68,14 +189,14 @@ export default function EmbedDataTablesPage(props) {
   useEffect(() => {
     async function load_static_data() {
       try {
-        const json = await ckan_action_api('datastore_search', {
+        const response = await ckan_action_api('datastore_search', {
           resource_id: '04cbec5c-5a3d-4d34-927d-e41c9e6e3736',
           limit: 32000,
         });
 
         setStaticTableData({
-          data: json.result.records,
-          columns: json.result.fields
+          data: response.json.result.records,
+          columns: response.json.result.fields
             .filter((f) => f.id !== '_id')
             .map((f) => ({
               title: f.id,
@@ -89,6 +210,52 @@ export default function EmbedDataTablesPage(props) {
 
     load_static_data();
   }, []);
+
+  const serverTableRef = useRef(null);
+  const [serverTableColumns, setServerTableColumns] = useState([]);
+
+  useEffect(() => {
+    async function load_static_data() {
+      try {
+        const response = await ckan_action_api('datastore_search', {
+          resource_id: 'fac950c0-00d5-4ec1-a4d3-9cbebf98a305',
+          limit: 0,
+        });
+
+        setServerTableColumns(
+          response.json.result.fields
+            .filter((f) => f.id !== '_id')
+            .map((f) => ({
+              title: f.id,
+              data: f.id,
+            })),
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    load_static_data();
+  }, []);
+
+  const waitForDataTablesInput = (column, callback) => {
+    let tries = 0;
+    const maxTries = 30;
+
+    const timer = setInterval(() => {
+      const input = column.footer()?.querySelector('input');
+
+      if (input || tries >= maxTries) {
+        clearInterval(timer);
+
+        if (input) {
+          callback(input);
+        }
+      }
+
+      tries++;
+    }, 100);
+  };
 
   return (
     <>
@@ -221,10 +388,10 @@ export default function EmbedDataTablesPage(props) {
                   target={'_blank'}
                 >
                   Open Government Portal Department List - Government of Canada
-                  Department List{' '}
+                  Department List
                 </Link>
               </p>
-              {staticTableData && (
+              {staticTableData.columns.length > 0 ? (
                 <div
                   className={clsx(
                     'w-full',
@@ -235,7 +402,7 @@ export default function EmbedDataTablesPage(props) {
                   )}
                 >
                   <DataTable
-                    key={staticTableData.columns.map((c) => c.data).join('-')}
+                    key={staticTableData.columns.map((_c) => _c.data).join('-')}
                     data={staticTableData.data}
                     columns={staticTableData.columns}
                     options={{
@@ -257,6 +424,17 @@ export default function EmbedDataTablesPage(props) {
                     )}
                   />
                 </div>
+              ) : (
+                <div
+                  className={clsx(
+                    'min-h-112',
+                    'flex',
+                    'items-center',
+                    'justify-center',
+                  )}
+                >
+                  <Loader />
+                </div>
               )}
             </div>
             <CodeTabs
@@ -275,9 +453,16 @@ export default function EmbedDataTablesPage(props) {
           <m.div
             className={ContainerMainStyle}
             variants={splashTextAnimation}
-            id={'datatables-client-side'}
+            id={'datatables-server-side'}
           >
-            <div className={ContentMainStyle}>
+            <div
+              className={clsx(
+                ContentMainStyle,
+                'w-[calc(66.6667%-128px)]',
+                'min-w-[calc(66.6667%-128px)]',
+                'max-w-[calc(66.6667%-128px)]',
+              )}
+            >
               <div className={PageBreakStyle}></div>
               <h3>Server-side Processing</h3>
               <p>
@@ -289,8 +474,161 @@ export default function EmbedDataTablesPage(props) {
                 millions of records while transferring only a small amount of
                 data for each interaction.
               </p>
+              <p>
+                Resource:{' '}
+                <Link
+                  className={PageLinkStyle}
+                  href={
+                    'https://open.canada.ca/data/en/dataset/d8f85d91-7dec-4fd1-8055-483b77225d8b/resource/fac950c0-00d5-4ec1-a4d3-9cbebf98a305'
+                  }
+                  target={'_blank'}
+                >
+                  Proactive Publication - Contracts - Contracts over $10,000
+                </Link>
+              </p>
+              {serverTableColumns.length > 0 ? (
+                <div
+                  className={clsx(
+                    'w-full',
+                    'min-w-full',
+                    'max-w-full',
+                    'block',
+                    'relative',
+                  )}
+                >
+                  <DataTable
+                    ref={serverTableRef}
+                    key={serverTableColumns.map((_c) => _c.data).join('-')}
+                    columns={serverTableColumns}
+                    options={{
+                      autoWidth: true,
+                      searchHighlight: true,
+                      responsive: false,
+                      processing: true,
+                      scrollX: true,
+                      scrollY: '448px',
+                      scrollCollapse: true,
+                      searching: false,
+                      paging: true,
+                      columnControl: [
+                        {
+                          target: 'thead',
+                          content: ['order'],
+                        },
+                        {
+                          target: 'tfoot',
+                          content: ['search'],
+                        },
+                      ],
+                      ajax: async (_data, _callback) => {
+                        const limit = _data.length || 10;
+                        const offset = _data.start || 0;
+                        const order = _data.order?.[0];
+                        const orderColumnName =
+                          order && serverTableColumns[order.column]
+                            ? serverTableColumns[order.column].data
+                            : null;
+                        const sort = orderColumnName
+                          ? encodeURIComponent(
+                              `${orderColumnName} ${order.dir}`,
+                            )
+                          : '';
+                        const filters = {};
+                        _data.columns?.forEach((_c) => {
+                          if (_c.search.value) {
+                            filters[_c.data] = _c.search.value;
+                          }
+                        });
+                        try {
+                          const response = await ckan_action_api(
+                            'datastore_search',
+                            {
+                              resource_id:
+                                'fac950c0-00d5-4ec1-a4d3-9cbebf98a305',
+                              limit: limit,
+                              offset: offset,
+                              sort: sort,
+                              filters: JSON.stringify(filters),
+                            },
+                          );
+                          _callback({
+                            data: response.json.result.records,
+                            recordsTotal: response.json.result.total,
+                            recordsFiltered: response.json.result.total,
+                          });
+                        } catch (_err) {
+                          console.error(_err);
+                          _callback({
+                            data: [],
+                            recordsTotal: 0,
+                            recordsFiltered: 0,
+                          });
+                        }
+                        // fetch(url, {headers: {'Authorization': }})
+                        //   .then((r) => r.json())
+                        //   .then((json) => {
+                        //     _callback({
+                        //       data: json.result.records,
+                        //       recordsTotal: json.result.total,
+                        //       recordsFiltered: json.result.total,
+                        //     });
+                        //   });
+                      },
+                      initComplete(_settings) {
+                        this.api()
+                          .columns()
+                          .every(function () {
+                            const column = this;
+                            waitForDataTablesInput(column, (input) => {
+                              input.addEventListener('keyup', (event) => {
+                                if (
+                                  event.key === 'Enter' &&
+                                  column.search() !== input.value
+                                ) {
+                                  column.search(input.value).draw();
+                                }
+                              });
+                            });
+                          });
+                      },
+                      // drawCallback() {
+                      //   const table = this;
+                      //   $('#datatables-server-side tbody').unhighlight();
+                      //   table.columns().every(function () {
+                      //     const search = this.search();
+                      //     if (search) {
+                      //       $(this.nodes()).highlight(search);
+                      //     }
+                      //   });
+                      // },
+                    }}
+                    className={clsx(
+                      'table',
+                      'table-striped',
+                      'table-hover',
+                      'dark',
+                      'w-full',
+                    )}
+                  />
+                </div>
+              ) : (
+                <div
+                  className={clsx(
+                    'min-h-112',
+                    'flex',
+                    'items-center',
+                    'justify-center',
+                  )}
+                >
+                  <Loader />
+                </div>
+              )}
             </div>
-            <CodeTabs />
+            <CodeTabs
+              className={clsx('mt-24')}
+              examples={server_table_examples}
+              label={'Server Side DataTables w/ DataStore Filters'}
+            />
           </m.div>
         </m.div>
       </AnimatePresence>

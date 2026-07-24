@@ -10,13 +10,20 @@ export async function ckan_api(url, init = {}) {
     },
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    throw new Error(
+    console.warning(
       `Request failed (${response.status}): ${response.statusText}`,
     );
   }
 
-  return response.json();
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+    json: data,
+  };
 }
 
 export async function ckan_action_api(action, params = {}) {
