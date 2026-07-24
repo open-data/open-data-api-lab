@@ -1,3 +1,5 @@
+'use client';
+
 import clsx from 'clsx';
 import DataTable from '@/components/dataTableClient';
 import { useEffect, useState, useRef } from 'react';

@@ -1,0 +1,31 @@
+name: Build & Publish Release Notes
+env:
+  NODE_VERSION: '24'
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'release/*'
+      - 'pre/*'
+
+jobs:
+  sphinx-it-up:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Node
+        run: |
+          apk add nodejs npm
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Build React Project
+        run: |
+          npm run build
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          user_name: ${{ secrets.GIT__USER_NAME }}
+          user_email: ${{ secrets.GIT__USER_EMAIL }}
