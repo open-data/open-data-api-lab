@@ -1,3 +1,7 @@
+# Canadian Open Data API Lab
+
+## [Enter the Lab](https://open-data.github.io/open-data-api-lab/)
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
