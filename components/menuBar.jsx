@@ -44,7 +44,7 @@ export default function MenuBar(props) {
             tabIndex={props.pathname == '/' ? '-1' : '0'}
           >
             <Image
-              src={'/opendatacan_t.png'}
+              src={`${process.env.__NEXT_ROUTER_BASEPATH || ''}/opendatacan_t.png`}
               width={75}
               height={75}
               alt={''}

@@ -104,7 +104,12 @@ export default function CodeTabs(props) {
 
         {current ? (
           <ShikiHighlighter
-            className={clsx('overflow-x-scroll!', 'text-sm', 'rounded-none!')}
+            className={clsx(
+              props.codeClassName,
+              'overflow-x-scroll!',
+              'text-sm',
+              'rounded-none!',
+            )}
             language={current.language}
             theme={theme}
             showLineNumbers={true}

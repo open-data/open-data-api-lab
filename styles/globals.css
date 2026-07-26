@@ -96,10 +96,21 @@ pre.shiki * {
   @apply duration-0!;
 }
 
+.dtcc-search input {
+  @apply py-1!;
+  @apply px-2!;
+}
+
 .dtcc-search-type-icon,
 .dtcc-search-type-icon + select {
   @apply hidden!;
   @apply pointer-events-none!;
+}
+
+.dt-highlight {
+  @apply bg-amber-400;
+  @apply text-palette-black;
+  @apply p-0;
 }
 
 h1,

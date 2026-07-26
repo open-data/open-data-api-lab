@@ -5,7 +5,7 @@ export async function ckan_api(url, init = {}) {
     ...init,
     headers: {
       Accept: 'application/json',
-      Authorization: API_KEY,
+      ...(API_KEY ? { Authorization: API_KEY } : {}),
       ...init.headers,
     },
   });

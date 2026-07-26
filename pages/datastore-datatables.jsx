@@ -19,6 +19,7 @@ import { WarningIcon } from '@phosphor-icons/react';
 import { API_BASE_URI } from '@/utils/constants';
 import { animationWrapper, splashTextAnimation } from '@/utils/animations';
 import { ckan_action_api } from '@/utils/functions';
+import { API_KEY } from '@/utils/constants';
 
 export default function EmbedDataTablesPage(props) {
   const static_table_examples = [
@@ -99,26 +100,26 @@ export default function EmbedDataTablesPage(props) {
           // convert DataTables components to DataStore parameters
           const limit = _data.length || 10;
           const offset = _data.start || 0;
-          const search = encodeURIComponent(_data.search.value) || '';
-          const orderColumnIndex = typeof _data.order[0] != 'undefined' ? _data.order[0].column : null;
-          const orderDirection = typeof _data.order[0] != 'undefined' ? _data.order[0].dir : null;
-          const orderColumnName = typeof _data.order[0] != 'undefined' ? columns[orderColumnIndex].data : null;
-          const sort = orderColumnName ? encodeURIComponent(\`\${orderColumnName} \${orderDirection}\`) : '';
-          let filters = {};
-          _data.columns.forEach((_c) => {
-            if( _c.search.value ){
-              filters[_c.data] = _c.search.value;
-            }
+          const search = encodeURIComponent(_data?.search?.value ?? '');
+          const order = _data.order?.[0];
+          const sort = order && columns[order.column] ? \`\${columns[order.column].data} \${order.dir}\` : '';  // datastore sort does not support %20 URI encoding for spaces
+          const filters = {};
+          _data.columns?.forEach((_c) => {
+            if (_c.search.value) { filters[_c.data] = _c.search.value; }
           });
-          filters = encodeURIComponent(JSON.stringify(filters));
-          const url = \`
-            ${API_BASE_URI}/api/action/datastore_search?resource_id=fac950c0-00d5-4ec1-a4d3-9cbebf98a305
-            &limit=\${limit}
-            &offset=\${offset}
-            &sort=\${sort}
-            &filters=\${filters}
-            &q=\${search}
-          \`;
+          const url = new URL(\`${API_BASE_URI}/api/action/datastore_search\`);
+          url.searchParams.set('resource_id', 'fac950c0-00d5-4ec1-a4d3-9cbebf98a305');
+          url.searchParams.set('limit', limit);
+          url.searchParams.set('offset', offset);
+          if (sort) {
+            url.searchParams.set('sort', sort);
+          }
+          if (Object.keys(filters).length) {
+            url.searchParams.set('filters', JSON.stringify(filters));
+          }
+          if (search) {
+            url.searchParams.set('q', search);
+          }
           fetch(url)
             .then(r => r.json())
             .then(json => _callback({
@@ -187,7 +188,6 @@ export default function EmbedDataTablesPage(props) {
     data: [],
     columns: [],
   });
-
   useEffect(() => {
     async function load_static_data() {
       try {
@@ -213,11 +213,9 @@ export default function EmbedDataTablesPage(props) {
     load_static_data();
   }, []);
 
-  const serverTableRef = useRef(null);
   const [serverTableColumns, setServerTableColumns] = useState([]);
-
   useEffect(() => {
-    async function load_static_data() {
+    async function load_server_data() {
       try {
         const response = await ckan_action_api('datastore_search', {
           resource_id: 'fac950c0-00d5-4ec1-a4d3-9cbebf98a305',
@@ -237,8 +235,26 @@ export default function EmbedDataTablesPage(props) {
       }
     }
 
-    load_static_data();
+    load_server_data();
   }, []);
+
+  function highlightCell(cell, search) {
+    const text = cell.textContent;
+
+    if (!text || !search) {
+      return;
+    }
+
+    const regex = new RegExp(
+      search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      'gi',
+    );
+
+    cell.innerHTML = text.replace(
+      regex,
+      (match) => `<mark class="dt-highlight">${match}</mark>`,
+    );
+  }
 
   const waitForDataTablesInput = (column, callback) => {
     let tries = 0;
@@ -258,6 +274,34 @@ export default function EmbedDataTablesPage(props) {
       tries++;
     }, 100);
   };
+
+  const staticRef = useRef(null);
+  const [staticSecHeight, setStaticSecHeight] = useState(null);
+  const serverRef = useRef(null);
+  const [serverSecHeight, setServerSecHeight] = useState(null);
+
+  useEffect(() => {
+    const staticSec = staticRef.current;
+    const serverSec = serverRef.current;
+
+    const updateHeights = () => {
+      setStaticSecHeight(
+        staticSec ? `[${staticSec.getBoundingClientRect().height}px]` : 'auto',
+      );
+      setServerSecHeight(
+        serverSec ? `[${serverSec.getBoundingClientRect().height}px]` : 'auto',
+      );
+    };
+
+    const observer = new ResizeObserver(updateHeights);
+    observer.observe(staticSec);
+    observer.observe(serverSec);
+    updateHeights();
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <>
@@ -369,6 +413,7 @@ export default function EmbedDataTablesPage(props) {
                 'min-w-[calc(66.6667%-128px)]',
                 'max-w-[calc(66.6667%-128px)]',
               )}
+              ref={staticRef}
             >
               <div className={PageBreakStyle}></div>
               <h3>Client-side Processing</h3>
@@ -464,6 +509,7 @@ export default function EmbedDataTablesPage(props) {
                 'min-w-[calc(66.6667%-128px)]',
                 'max-w-[calc(66.6667%-128px)]',
               )}
+              ref={serverRef}
             >
               <div className={PageBreakStyle}></div>
               <h3>Server-side Processing</h3>
@@ -495,11 +541,9 @@ export default function EmbedDataTablesPage(props) {
                     'min-w-full',
                     'max-w-full',
                     'block',
-                    'relative',
                   )}
                 >
                   <DataTable
-                    ref={serverTableRef}
                     key={serverTableColumns.map((_c) => _c.data).join('-')}
                     columns={serverTableColumns}
                     options={{
@@ -507,6 +551,7 @@ export default function EmbedDataTablesPage(props) {
                       searchHighlight: true,
                       responsive: false,
                       processing: true,
+                      serverSide: true,
                       scrollX: true,
                       scrollY: '448px',
                       scrollCollapse: true,
@@ -522,59 +567,56 @@ export default function EmbedDataTablesPage(props) {
                           content: ['search'],
                         },
                       ],
-                      ajax: async (_data, _callback) => {
+                      ajax: (_data, _callback) => {
                         const limit = _data.length || 10;
                         const offset = _data.start || 0;
+                        const search = encodeURIComponent(
+                          _data?.search?.value ?? '',
+                        );
                         const order = _data.order?.[0];
-                        const orderColumnName =
+                        const sort =
                           order && serverTableColumns[order.column]
-                            ? serverTableColumns[order.column].data
-                            : null;
-                        const sort = orderColumnName
-                          ? encodeURIComponent(
-                              `${orderColumnName} ${order.dir}`,
-                            )
-                          : '';
+                            ? `${serverTableColumns[order.column].data} ${order.dir}`
+                            : '';
                         const filters = {};
                         _data.columns?.forEach((_c) => {
                           if (_c.search.value) {
                             filters[_c.data] = _c.search.value;
                           }
                         });
-                        try {
-                          const response = await ckan_action_api(
-                            'datastore_search',
-                            {
-                              resource_id:
-                                'fac950c0-00d5-4ec1-a4d3-9cbebf98a305',
-                              limit: limit,
-                              offset: offset,
-                              sort: sort,
-                              filters: JSON.stringify(filters),
-                            },
-                          );
-                          _callback({
-                            data: response.json.result.records,
-                            recordsTotal: response.json.result.total,
-                            recordsFiltered: response.json.result.total,
-                          });
-                        } catch (_err) {
-                          console.error(_err);
-                          _callback({
-                            data: [],
-                            recordsTotal: 0,
-                            recordsFiltered: 0,
-                          });
+                        const url = new URL(
+                          `${API_BASE_URI}/data/api/action/datastore_search`,
+                        );
+                        url.searchParams.set(
+                          'resource_id',
+                          'fac950c0-00d5-4ec1-a4d3-9cbebf98a305',
+                        );
+                        url.searchParams.set('limit', limit);
+                        url.searchParams.set('offset', offset);
+                        if (sort) {
+                          url.searchParams.set('sort', sort);
                         }
-                        // fetch(url, {headers: {'Authorization': }})
-                        //   .then((r) => r.json())
-                        //   .then((json) => {
-                        //     _callback({
-                        //       data: json.result.records,
-                        //       recordsTotal: json.result.total,
-                        //       recordsFiltered: json.result.total,
-                        //     });
-                        //   });
+                        if (Object.keys(filters).length) {
+                          url.searchParams.set(
+                            'filters',
+                            JSON.stringify(filters),
+                          );
+                        }
+                        if (search) {
+                          url.searchParams.set('q', search);
+                        }
+                        const fetchConfig = API_KEY
+                          ? { headers: { Authorization: API_KEY } }
+                          : {};
+                        fetch(url, fetchConfig)
+                          .then((r) => r.json())
+                          .then((json) =>
+                            _callback({
+                              data: json.result.records,
+                              recordsTotal: json.result.total,
+                              recordsFiltered: json.result.total,
+                            }),
+                          );
                       },
                       initComplete(_settings) {
                         this.api()
@@ -593,16 +635,28 @@ export default function EmbedDataTablesPage(props) {
                             });
                           });
                       },
-                      // drawCallback() {
-                      //   const table = this;
-                      //   $('#datatables-server-side tbody').unhighlight();
-                      //   table.columns().every(function () {
-                      //     const search = this.search();
-                      //     if (search) {
-                      //       $(this.nodes()).highlight(search);
-                      //     }
-                      //   });
-                      // },
+                      drawCallback() {
+                        document
+                          .querySelectorAll(
+                            '#datatables-server-side tbody mark.dt-highlight',
+                          )
+                          .forEach((mark) => {
+                            mark.replaceWith(
+                              document.createTextNode(mark.textContent),
+                            );
+                          });
+                        this.api()
+                          .columns()
+                          .every(function () {
+                            const search = this.search();
+                            if (!search) {
+                              return;
+                            }
+                            this.nodes().each((cell) => {
+                              highlightCell(cell, search);
+                            });
+                          });
+                      },
                     }}
                     className={clsx(
                       'table',
@@ -628,6 +682,7 @@ export default function EmbedDataTablesPage(props) {
             </div>
             <CodeTabs
               className={clsx('mt-24')}
+              codeClassName={clsx(`max-h-${serverSecHeight}`)}
               examples={server_table_examples}
               label={'Server Side DataTables w/ DataStore Filters'}
             />
