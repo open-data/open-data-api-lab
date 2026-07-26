@@ -22,7 +22,7 @@ jobs:
       - name: Build React Project
         run: |
           npm install
-          npm run build
+          npm run build:export
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
