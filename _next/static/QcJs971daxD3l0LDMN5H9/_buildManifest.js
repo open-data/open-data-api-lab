@@ -1,16 +1,21 @@
 self.__BUILD_MANIFEST = {
   "/": [
-    "static/chunks/3btflqvp0sakt.js"
+    "static/chunks/2rtaw_bkvd_x7.js"
   ],
   "/_error": [
-    "static/chunks/2tzkcfpv3d_og.js"
+    "static/chunks/0bh6ybr7utckm.js"
   ],
   "/datastore-datatables": [
-    "static/chunks/0qxp-oe777jy7.js"
+    "static/chunks/3j8vh35jz5h17.js"
   ],
   "__rewrites": {
     "afterFiles": [],
-    "beforeFiles": [],
+    "beforeFiles": [
+      {
+        "source": "/open-data-api-lab//_next/:path+",
+        "destination": "/open-data-api-lab/_next/:path+"
+      }
+    ],
     "fallback": []
   },
   "sortedPages": [
