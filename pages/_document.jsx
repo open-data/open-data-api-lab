@@ -12,16 +12,25 @@ export default function Document() {
         <meta name="theme-color" content="#38414d" />
 
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="/opendatacan_c.png" />
+        <meta
+          property="og:image"
+          content={`${process.env.__NEXT_ROUTER_BASEPATH || ''}/opendatacan_c.png`}
+        />
 
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:image" content="/opendatacan_c.png" />
+        <meta
+          property="twitter:image"
+          content={`${process.env.__NEXT_ROUTER_BASEPATH || ''}/opendatacan_c.png`}
+        />
 
-        <link rel="icon" href="/opendatacan_r.png" />
+        <link
+          rel="icon"
+          href={`${process.env.__NEXT_ROUTER_BASEPATH || ''}/opendatacan_r.png`}
+        />
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href="/opendatacan_r.png"
+          href={`${process.env.__NEXT_ROUTER_BASEPATH || ''}/opendatacan_r.png`}
         ></link>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
