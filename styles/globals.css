@@ -195,6 +195,11 @@ h4 {
   @apply inline-flex!;
   @apply items-center!;
   @apply whitespace-nowrap!;
+  @apply justify-start;
+}
+
+.dt-type-numeric .dt-column-title {
+  @apply justify-end;
 }
 
 * {

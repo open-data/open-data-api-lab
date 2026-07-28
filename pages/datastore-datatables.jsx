@@ -511,8 +511,8 @@ export default function EmbedDataTablesPage(props) {
       language: 'javascript',
       code: `
 <style>
-  .group-header td{ background-color: #335075 !important; color: white !important; }
-  .group-summary td{ background-color: #38414d !important; color: white !important; }
+  .group-header td{ background-color: #335075 !important; color: white !important; box-shadow: none !important; }
+  .group-summary td{ background-color: #38414d !important; color: white !important; box-shadow: none !important; }
 </style>
 
 <table id="example" class="display table table-striped" style="width:100%"></table>
@@ -556,6 +556,7 @@ export default function EmbedDataTablesPage(props) {
         .map((_f) => {
           const column = {
             data: _f.id,
+            name: _f.id,  // add name for DataTables API column ":name" selections
             title: _f.id,
           };
           if (_f.id == 'org_name') {
@@ -663,7 +664,7 @@ export default function EmbedDataTablesPage(props) {
         },
         footerCallback: function () {
           const api = this.api();
-          const values = api.column('pageviews:name').data().toArray().map(Number).filter(Number.isFinite);
+          const values = api.column('pageviews:name', { search: 'applied' }).data().toArray().map(Number).filter(Number.isFinite);
           const total = values.reduce((sum, value) => sum + value, 0);
           const average = values.length ? total / values.length : 0;
           const maximum = values.length ? Math.max(...values) : 0;
@@ -1592,7 +1593,7 @@ export default function EmbedDataTablesPage(props) {
                       footerCallback: function () {
                         const api = this.api();
                         const values = api
-                          .column('pageviews:name')
+                          .column('pageviews:name', { search: 'applied' })
                           .data()
                           .toArray()
                           .map(Number)

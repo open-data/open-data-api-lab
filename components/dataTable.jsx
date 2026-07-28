@@ -22,8 +22,6 @@ DataTablesCore.ColumnControl.SearchInput.prototype.runSearch = function () {
   return;
 };
 
-export const dataTableNumberRenderer = DataTablesCore.render.number;
-
 export default function DataTableComponent(props) {
   return <DataTable {...props} />;
 }
