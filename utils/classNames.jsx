@@ -87,3 +87,14 @@ export const CodeTabButtonStyle = clsx(
   'active:bg-ui-btn-bg-focus',
   'focus:bg-ui-btn-bg-focus',
 );
+
+export const LinkIconStyle = clsx(
+  'inline',
+  'scale-x-[-1]',
+  'transition-all',
+  'duration-300',
+  'opacity-0',
+  'group-hover:opacity-100',
+  'group-active:opacity-100',
+  'group-focuse:opacity-100',
+);

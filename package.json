@@ -28,6 +28,7 @@
     "datatables.net-react": "^1.0.2",
     "datatables.net-responsive": "^4.0.0",
     "datatables.net-responsive-bs5": "^4.0.0",
+    "datatables.net-rowgroup-bs5": "^2.0.0",
     "jquery": "^4.0.0",
     "jquery-highlight": "^3.5.0",
     "motion": "^12.40.0",

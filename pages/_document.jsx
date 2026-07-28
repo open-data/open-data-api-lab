@@ -5,8 +5,7 @@ export default function Document() {
     <Html
       lang="en"
       data-bs-theme="dark"
-      class="dark"
-      className="scroll-smooth"
+      className="dark scroll-smooth"
       data-scroll-behavior="smooth"
     >
       <Head>

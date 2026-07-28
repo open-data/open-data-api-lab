@@ -3,6 +3,7 @@
 @import 'datatables.net-bs5';
 @import 'datatables.net-buttons-bs5';
 @import 'datatables.net-responsive-bs5';
+@import 'datatables.net-rowgroup-bs5';
 @import 'datatables.net-columncontrol-bs5';
 @import 'tailwindcss';
 
@@ -64,6 +65,9 @@ p,
 li {
   @apply font-roboto;
   @apply text-lg;
+  @apply max-s500:text-base;
+  @apply max-s768:text-base;
+  @apply max-s992:text-base;
   @apply break-normal!;
 }
 
@@ -115,7 +119,8 @@ pre.shiki * {
 
 h1,
 h2,
-h3 {
+h3,
+h4 {
   @apply text-ui-white;
   @apply font-roboto;
   @apply break-normal!;
@@ -154,9 +159,42 @@ h3 {
   @apply mt-4;
 }
 
+h4 {
+  @apply text-xl;
+  @apply max-s500:text-lg;
+  @apply max-s768:text-lg;
+  @apply max-s992:text-xl;
+  @apply mb-2;
+  @apply mt-4;
+}
+
 .dt-container .highlight {
   @apply bg-[rgba(255,229,54,0.35)];
   @apply text-palette-black;
+}
+
+.group-header,
+.group-summary {
+  @apply shadow-none!;
+  @apply bg-transparent!;
+}
+
+.group-header td {
+  @apply shadow-none!;
+  @apply bg-[rgba(51,80,117,0.5)]!;
+  @apply text-palette-lite-grey!;
+}
+
+.group-summary td {
+  @apply shadow-none!;
+  @apply bg-[rgba(56,65,77,0.5)]!;
+  @apply text-palette-lite-grey!;
+}
+
+.dt-column-title {
+  @apply inline-flex!;
+  @apply items-center!;
+  @apply whitespace-nowrap!;
 }
 
 * {

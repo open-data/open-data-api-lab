@@ -8,6 +8,7 @@ import DataTablesCore from 'datatables.net-bs5';
 
 import 'datatables.net-buttons-bs5';
 import 'datatables.net-responsive-bs5';
+import 'datatables.net-rowgroup-bs5';
 import 'datatables.net-columncontrol-bs5';
 
 import 'datatables.net-bs5/css/dataTables.bootstrap5.css';
@@ -20,6 +21,8 @@ DataTable.use(DataTablesCore);
 DataTablesCore.ColumnControl.SearchInput.prototype.runSearch = function () {
   return;
 };
+
+export const dataTableNumberRenderer = DataTablesCore.render.number;
 
 export default function DataTableComponent(props) {
   return <DataTable {...props} />;
