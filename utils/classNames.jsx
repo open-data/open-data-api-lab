@@ -14,6 +14,8 @@ export const MenuBarLinkStyle = clsx(
   'rounded-xl',
   'flex',
   'items-center',
+  'mb-2',
+  'no-underline!',
 );
 
 export const PageLinkStyle = clsx(
@@ -28,6 +30,7 @@ export const PageLinkStyle = clsx(
   'focus:underline-offset-2',
   'active:underline-offset-2',
   'hover:underline-offset-2',
+  'text-ui-white!',
 );
 
 export const PageMainStyle = clsx(
@@ -97,4 +100,5 @@ export const LinkIconStyle = clsx(
   'group-hover:opacity-100',
   'group-active:opacity-100',
   'group-focuse:opacity-100',
+  'text-ui-white!',
 );

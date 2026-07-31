@@ -20,6 +20,7 @@ export default function MenuBar(props) {
           'bg-ui-dark-bg',
           'border-r-2',
           'border-ui-dark-border-color',
+          'z-99',
         )}
         variants={slideInLeftAnimation}
         initial={'hidden'}
@@ -37,6 +38,7 @@ export default function MenuBar(props) {
               'duration-300',
               'justify-start',
               'items-center',
+              'no-underline!',
               props.pathname == '/'
                 ? 'pointer-default! pointer-events-none!'
                 : '',
@@ -86,6 +88,19 @@ export default function MenuBar(props) {
           >
             <TableIcon size={24} />
             &nbsp; DataStore DataTables
+          </Link>
+          <Link
+            href={'/wet-tables'}
+            className={clsx(
+              MenuBarLinkStyle,
+              props.pathname == '/wet-tables'
+                ? 'bg-ui-btn-bg-active! pointer-default! pointer-events-none!'
+                : '',
+            )}
+            tabIndex={props.pathname == '/wet-tables' ? '-1' : '0'}
+          >
+            <TableIcon size={24} />
+            &nbsp; WET-BOEW Tables
           </Link>
         </div>
       </m.div>

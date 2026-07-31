@@ -9,7 +9,7 @@ import DocHead from '@/components/docHead';
 import Link from 'next/link';
 import CodeTabs from '@/components/codeTabs';
 import Loader from '@/components/loader';
-import { LinkIcon, QuestionIcon } from '@phosphor-icons/react';
+import { LinkIcon, QuestionIcon, WarningIcon } from '@phosphor-icons/react';
 import {
   PageMainStyle,
   ContainerMainStyle,
@@ -18,7 +18,6 @@ import {
   PageBreakStyle,
   LinkIconStyle,
 } from '@/utils/classNames';
-import { WarningIcon } from '@phosphor-icons/react';
 import { API_BASE_URI } from '@/utils/constants';
 import { animationWrapper, splashTextAnimation } from '@/utils/animations';
 import { ckan_action_api } from '@/utils/functions';
@@ -898,7 +897,7 @@ export default function EmbedDataTablesPage(props) {
               <h3 className={clsx('flex', 'items-center')}>
                 <Link
                   href={'#datatables-client-side'}
-                  className={clsx('inline', 'group')}
+                  className={clsx('inline', 'group', 'text-ui-white!')}
                 >
                   Client-side Processing&nbsp;
                   <LinkIcon className={LinkIconStyle} />
@@ -1007,7 +1006,7 @@ export default function EmbedDataTablesPage(props) {
               <h3 className={clsx('flex', 'items-center')}>
                 <Link
                   href={'#datatables-server-side'}
-                  className={clsx('inline', 'group')}
+                  className={clsx('inline', 'group', 'text-ui-white!')}
                 >
                   Server-side Processing&nbsp;
                   <LinkIcon className={LinkIconStyle} />
@@ -1241,7 +1240,7 @@ export default function EmbedDataTablesPage(props) {
               <h3 className={clsx('flex', 'items-center')}>
                 <Link
                   href={'#datatables-data-dictionary'}
-                  className={clsx('inline', 'group')}
+                  className={clsx('inline', 'group', 'text-ui-white!')}
                 >
                   Data Dictionary, Cell Types, & Cell Renderers&nbsp;
                   <LinkIcon className={LinkIconStyle} />
@@ -1413,7 +1412,7 @@ export default function EmbedDataTablesPage(props) {
               <h3 className={clsx('flex', 'items-center')}>
                 <Link
                   href={'#datatables-grouping'}
-                  className={clsx('inline', 'group')}
+                  className={clsx('inline', 'group', 'text-ui-white!')}
                 >
                   Row Grouping & Summary Statistics Row&nbsp;
                   <LinkIcon className={LinkIconStyle} />

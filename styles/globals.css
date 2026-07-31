@@ -75,6 +75,22 @@ p {
   @apply pb-1;
 }
 
+table,
+tr,
+th,
+td {
+  @apply font-roboto;
+  @apply text-base!;
+}
+
+td {
+  @apply border-ui-dark-border-color!;
+}
+
+pre {
+  @apply border-none!;
+}
+
 pre.shiki {
   @apply rounded-none!;
   @apply m-0!;
@@ -200,6 +216,13 @@ h4 {
 
 .dt-type-numeric .dt-column-title {
   @apply justify-end;
+}
+
+div[data-bs-theme='light'] {
+  @apply bg-white;
+  @apply py-4;
+  @apply px-8;
+  @apply rounded-2xl;
 }
 
 * {

@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-export default function DocHead(props) {
+export default function DocHead({ children, ...props }) {
   const router = useRouter();
   return (
     <Head>
@@ -22,6 +22,8 @@ export default function DocHead(props) {
       />
       <meta property="twitter:title" content={props.title} />
       <meta property="twitter:description" content={props.description} />
+
+      {children}
     </Head>
   );
 }
